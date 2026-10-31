@@ -1,0 +1,509 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D2C7847072D4658890C4F81 /* LifonMusicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273BCD556F7D485E8156EE50 /* LifonMusicApp.swift */; };
+		D5292E9D9C334647B230B3EC /* Achievement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38376A1D58A4E1795156799 /* Achievement.swift */; };
+		1D5428C1A5304C009A6C9D82 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF03277F13944CA5B07B184D /* Album.swift */; };
+		F3734F1059EE47B19D5C5EA6 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7201027E559413CA6954D40 /* ApiClient.swift */; };
+		BCAABCF213ED44CDB7AC1EE8 /* ApiConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A3BBDCE9E74C07A8C5E202 /* ApiConfig.swift */; };
+		4DFE31C177BA4B71872F1ACA /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4545B5EE5C1243C3B63DE911 /* AudioPlayerService.swift */; };
+		6471A696B4034B90A65E5FBC /* DominantColorExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BCE1A5AAE742E283DA87F2 /* DominantColorExtractor.swift */; };
+		4184B33E2543410FA6694E9C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC32B3F846C84FFBA6BAFD3F /* DownloadManager.swift */; };
+		79B5745C8E294B8FAFF5853B /* EqualizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB5AF98AC6455691739C94 /* EqualizerService.swift */; };
+		8070301A95A743839F6AA067 /* LyricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B545D101104FD9958C458F /* LyricsService.swift */; };
+		19BEC5FBD85E4C7C8B4B24A8 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD5DC2B0C1CB49A0A6039B27 /* AppViewModel.swift */; };
+		CF2147489D8046819DC25236 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7E7FDAAE9469CA65FF2F0 /* AuthViewModel.swift */; };
+		8EF866162A004A4DB59A503F /* LyricsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2642ADD6BDE4F839C1EDB90 /* LyricsViewModel.swift */; };
+		177890E8276F4AE295910194 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BF762B3D2D4896B0866972 /* AuthView.swift */; };
+		D1C12B50620C4F62BB5233B2 /* CupsizeInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC1BD7F0AEF24CCD8982D60F /* CupsizeInfoSheet.swift */; };
+		6D2E549CA76B409FBDE1CFB2 /* DisclaimerBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B8FB7AF47A42D5895F4AF2 /* DisclaimerBanner.swift */; };
+		959DFB0C81974D059988D286 /* MaintenanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687D7D5C558046B1BB88B02A /* MaintenanceView.swift */; };
+		A977AC25D647463893F0AE2D /* OfflineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8B67EE79ED4365B37F2912 /* OfflineView.swift */; };
+		60BB3E3F6BF84EE9BFF2B66F /* RoadmapSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475CAD3AD900406C947B3422 /* RoadmapSheet.swift */; };
+		54277548150E4FC89C5081FF /* AlbumCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A646B0EB4E480BB4840CA7 /* AlbumCardView.swift */; };
+		9A8D2ADFC23D47F58E230AE5 /* PlayingIndicatorDots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B27E19938E408D98932BDD /* PlayingIndicatorDots.swift */; };
+		DB9026C13D1F4DB5A4FDACF8 /* TrackRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06ED37B15CB547DA9FB52732 /* TrackRowView.swift */; };
+		8CCD47CF783A4D5784DA21C2 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4FF554387346F5BAB682B5 /* FavoritesView.swift */; };
+		08274C2B624E4CDB95AD2648 /* AlbumDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAF215C4ACF47048BDBEBDF /* AlbumDetailView.swift */; };
+		AEA9C69096B945309A1731A5 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070EA59549F84C3B8E0F8CD1 /* LibraryView.swift */; };
+		216E7B56E3174F36AB4D794A /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8B78D6FA44408DBE0BD548 /* MainTabView.swift */; };
+		A84E65AA5F70421D8DC88278 /* EqualizerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1EEB9907274C34B699BEED /* EqualizerSheet.swift */; };
+		1A57C39129D64784A610F3B4 /* FullPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5B438D824645D3BBA3B4FF /* FullPlayerView.swift */; };
+		68F5F616B90A42C2B72CB525 /* LyricsOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A808FEC46B34BD98EEC3E98 /* LyricsOverlayView.swift */; };
+		D534DF25079640399E1CF249 /* MiniPlayerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB23A52396B4A6A85FC5AC0 /* MiniPlayerBar.swift */; };
+		CA88F53F48B34B518FFC4E3F /* AchievementsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D28E915CD0E47CD94D25917 /* AchievementsSheet.swift */; };
+		74CFD7DC8DAE4D6883756ED4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE136EB7033C44DA82FBE155 /* ProfileView.swift */; };
+		59793590F6CA4A86A7B4109C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B4AC18BF087C49EEAE43928E /* Assets.xcassets */; };
+		DC54179E53DE4932A0678FF9 /* Lyrics in Resources */ = {isa = PBXBuildFile; fileRef = F99F9E68C498497AAED54D58 /* Lyrics */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		273BCD556F7D485E8156EE50 /* LifonMusicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LifonMusicApp.swift"; sourceTree = "<group>"; };
+		B38376A1D58A4E1795156799 /* Achievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Achievement.swift"; sourceTree = "<group>"; };
+		FF03277F13944CA5B07B184D /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Album.swift"; sourceTree = "<group>"; };
+		F7201027E559413CA6954D40 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApiClient.swift"; sourceTree = "<group>"; };
+		C5A3BBDCE9E74C07A8C5E202 /* ApiConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApiConfig.swift"; sourceTree = "<group>"; };
+		4545B5EE5C1243C3B63DE911 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayerService.swift"; sourceTree = "<group>"; };
+		06BCE1A5AAE742E283DA87F2 /* DominantColorExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DominantColorExtractor.swift"; sourceTree = "<group>"; };
+		CC32B3F846C84FFBA6BAFD3F /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadManager.swift"; sourceTree = "<group>"; };
+		E8EB5AF98AC6455691739C94 /* EqualizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EqualizerService.swift"; sourceTree = "<group>"; };
+		D5B545D101104FD9958C458F /* LyricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LyricsService.swift"; sourceTree = "<group>"; };
+		BD5DC2B0C1CB49A0A6039B27 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppViewModel.swift"; sourceTree = "<group>"; };
+		5EC7E7FDAAE9469CA65FF2F0 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthViewModel.swift"; sourceTree = "<group>"; };
+		B2642ADD6BDE4F839C1EDB90 /* LyricsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LyricsViewModel.swift"; sourceTree = "<group>"; };
+		C3BF762B3D2D4896B0866972 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthView.swift"; sourceTree = "<group>"; };
+		EC1BD7F0AEF24CCD8982D60F /* CupsizeInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CupsizeInfoSheet.swift"; sourceTree = "<group>"; };
+		03B8FB7AF47A42D5895F4AF2 /* DisclaimerBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisclaimerBanner.swift"; sourceTree = "<group>"; };
+		687D7D5C558046B1BB88B02A /* MaintenanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MaintenanceView.swift"; sourceTree = "<group>"; };
+		2A8B67EE79ED4365B37F2912 /* OfflineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OfflineView.swift"; sourceTree = "<group>"; };
+		475CAD3AD900406C947B3422 /* RoadmapSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RoadmapSheet.swift"; sourceTree = "<group>"; };
+		48A646B0EB4E480BB4840CA7 /* AlbumCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumCardView.swift"; sourceTree = "<group>"; };
+		51B27E19938E408D98932BDD /* PlayingIndicatorDots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayingIndicatorDots.swift"; sourceTree = "<group>"; };
+		06ED37B15CB547DA9FB52732 /* TrackRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrackRowView.swift"; sourceTree = "<group>"; };
+		BC4FF554387346F5BAB682B5 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoritesView.swift"; sourceTree = "<group>"; };
+		FFAF215C4ACF47048BDBEBDF /* AlbumDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumDetailView.swift"; sourceTree = "<group>"; };
+		070EA59549F84C3B8E0F8CD1 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryView.swift"; sourceTree = "<group>"; };
+		2C8B78D6FA44408DBE0BD548 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainTabView.swift"; sourceTree = "<group>"; };
+		DA1EEB9907274C34B699BEED /* EqualizerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EqualizerSheet.swift"; sourceTree = "<group>"; };
+		DC5B438D824645D3BBA3B4FF /* FullPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FullPlayerView.swift"; sourceTree = "<group>"; };
+		3A808FEC46B34BD98EEC3E98 /* LyricsOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LyricsOverlayView.swift"; sourceTree = "<group>"; };
+		0CB23A52396B4A6A85FC5AC0 /* MiniPlayerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MiniPlayerBar.swift"; sourceTree = "<group>"; };
+		4D28E915CD0E47CD94D25917 /* AchievementsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AchievementsSheet.swift"; sourceTree = "<group>"; };
+		CE136EB7033C44DA82FBE155 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileView.swift"; sourceTree = "<group>"; };
+		B4AC18BF087C49EEAE43928E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F99F9E68C498497AAED54D58 /* Lyrics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Lyrics; sourceTree = "<group>"; };
+		6E3CBFBDBBFB4A78B80F902C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D10E855E880A4ABF947B470B /* LifonMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifonMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DE12FB86DE364E679592D50E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		190C55F0E4C74D63B623AB2B = {
+			isa = PBXGroup;
+			children = (
+				82E9936E36DE45D4BE55B7A5 /* LifonMusic */,
+				9F63B6961DD64A69820B04E0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9F63B6961DD64A69820B04E0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D10E855E880A4ABF947B470B /* LifonMusic.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		82E9936E36DE45D4BE55B7A5 /* LifonMusic */ = {
+			isa = PBXGroup;
+			children = (
+				1A52FE3C28994C05AC9EEA31 /* App */,
+				9779E2B2A1E84E94A6C6379E /* Models */,
+				B25A3455946F4057BC6A6535 /* Services */,
+				1545066B1DE64444829D87CF /* ViewModels */,
+				E4F3EF2965644FB68EEA515D /* Views */,
+				9257F8FD83774EC28C0D0C05 /* Resources */,
+			);
+			path = LifonMusic;
+			sourceTree = "<group>";
+		};
+		1A52FE3C28994C05AC9EEA31 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				273BCD556F7D485E8156EE50 /* LifonMusicApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		9779E2B2A1E84E94A6C6379E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B38376A1D58A4E1795156799 /* Achievement.swift */,
+				FF03277F13944CA5B07B184D /* Album.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B25A3455946F4057BC6A6535 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F7201027E559413CA6954D40 /* ApiClient.swift */,
+				C5A3BBDCE9E74C07A8C5E202 /* ApiConfig.swift */,
+				4545B5EE5C1243C3B63DE911 /* AudioPlayerService.swift */,
+				06BCE1A5AAE742E283DA87F2 /* DominantColorExtractor.swift */,
+				CC32B3F846C84FFBA6BAFD3F /* DownloadManager.swift */,
+				E8EB5AF98AC6455691739C94 /* EqualizerService.swift */,
+				D5B545D101104FD9958C458F /* LyricsService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1545066B1DE64444829D87CF /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				BD5DC2B0C1CB49A0A6039B27 /* AppViewModel.swift */,
+				5EC7E7FDAAE9469CA65FF2F0 /* AuthViewModel.swift */,
+				B2642ADD6BDE4F839C1EDB90 /* LyricsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E4F3EF2965644FB68EEA515D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C3BF762B3D2D4896B0866972 /* AuthView.swift */,
+				EC1BD7F0AEF24CCD8982D60F /* CupsizeInfoSheet.swift */,
+				03B8FB7AF47A42D5895F4AF2 /* DisclaimerBanner.swift */,
+				687D7D5C558046B1BB88B02A /* MaintenanceView.swift */,
+				2A8B67EE79ED4365B37F2912 /* OfflineView.swift */,
+				475CAD3AD900406C947B3422 /* RoadmapSheet.swift */,
+				48A646B0EB4E480BB4840CA7 /* AlbumCardView.swift */,
+				51B27E19938E408D98932BDD /* PlayingIndicatorDots.swift */,
+				06ED37B15CB547DA9FB52732 /* TrackRowView.swift */,
+				BC4FF554387346F5BAB682B5 /* FavoritesView.swift */,
+				FFAF215C4ACF47048BDBEBDF /* AlbumDetailView.swift */,
+				070EA59549F84C3B8E0F8CD1 /* LibraryView.swift */,
+				2C8B78D6FA44408DBE0BD548 /* MainTabView.swift */,
+				DA1EEB9907274C34B699BEED /* EqualizerSheet.swift */,
+				DC5B438D824645D3BBA3B4FF /* FullPlayerView.swift */,
+				3A808FEC46B34BD98EEC3E98 /* LyricsOverlayView.swift */,
+				0CB23A52396B4A6A85FC5AC0 /* MiniPlayerBar.swift */,
+				4D28E915CD0E47CD94D25917 /* AchievementsSheet.swift */,
+				CE136EB7033C44DA82FBE155 /* ProfileView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9257F8FD83774EC28C0D0C05 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B4AC18BF087C49EEAE43928E /* Assets.xcassets */,
+				F99F9E68C498497AAED54D58 /* Lyrics */,
+				6E3CBFBDBBFB4A78B80F902C /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A4C38251E0C4447187D4EEF4 /* LifonMusic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC242AC3CAD54EB4ABB5296F /* Build configuration list for PBXNativeTarget "LifonMusic" */;
+			buildPhases = (
+				0D19A4C37486467D84F089BF /* Sources */,
+				DE12FB86DE364E679592D50E /* Frameworks */,
+				81D1403D7FA24D39A9D3A94C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LifonMusic;
+			productName = LifonMusic;
+			productReference = D10E855E880A4ABF947B470B /* LifonMusic.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EEC89329473848AE9B74FB40 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A4C38251E0C4447187D4EEF4 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 9165723EDDAB417CBF0370B1 /* Build configuration list for PBXProject "LifonMusic" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 190C55F0E4C74D63B623AB2B;
+			productRefGroup = 9F63B6961DD64A69820B04E0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A4C38251E0C4447187D4EEF4 /* LifonMusic */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		81D1403D7FA24D39A9D3A94C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				59793590F6CA4A86A7B4109C /* Assets.xcassets in Resources */,
+				DC54179E53DE4932A0678FF9 /* Lyrics in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0D19A4C37486467D84F089BF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D2C7847072D4658890C4F81 /* LifonMusicApp.swift in Sources */,
+				D5292E9D9C334647B230B3EC /* Achievement.swift in Sources */,
+				1D5428C1A5304C009A6C9D82 /* Album.swift in Sources */,
+				F3734F1059EE47B19D5C5EA6 /* ApiClient.swift in Sources */,
+				BCAABCF213ED44CDB7AC1EE8 /* ApiConfig.swift in Sources */,
+				4DFE31C177BA4B71872F1ACA /* AudioPlayerService.swift in Sources */,
+				6471A696B4034B90A65E5FBC /* DominantColorExtractor.swift in Sources */,
+				4184B33E2543410FA6694E9C /* DownloadManager.swift in Sources */,
+				79B5745C8E294B8FAFF5853B /* EqualizerService.swift in Sources */,
+				8070301A95A743839F6AA067 /* LyricsService.swift in Sources */,
+				19BEC5FBD85E4C7C8B4B24A8 /* AppViewModel.swift in Sources */,
+				CF2147489D8046819DC25236 /* AuthViewModel.swift in Sources */,
+				8EF866162A004A4DB59A503F /* LyricsViewModel.swift in Sources */,
+				177890E8276F4AE295910194 /* AuthView.swift in Sources */,
+				D1C12B50620C4F62BB5233B2 /* CupsizeInfoSheet.swift in Sources */,
+				6D2E549CA76B409FBDE1CFB2 /* DisclaimerBanner.swift in Sources */,
+				959DFB0C81974D059988D286 /* MaintenanceView.swift in Sources */,
+				A977AC25D647463893F0AE2D /* OfflineView.swift in Sources */,
+				60BB3E3F6BF84EE9BFF2B66F /* RoadmapSheet.swift in Sources */,
+				54277548150E4FC89C5081FF /* AlbumCardView.swift in Sources */,
+				9A8D2ADFC23D47F58E230AE5 /* PlayingIndicatorDots.swift in Sources */,
+				DB9026C13D1F4DB5A4FDACF8 /* TrackRowView.swift in Sources */,
+				8CCD47CF783A4D5784DA21C2 /* FavoritesView.swift in Sources */,
+				08274C2B624E4CDB95AD2648 /* AlbumDetailView.swift in Sources */,
+				AEA9C69096B945309A1731A5 /* LibraryView.swift in Sources */,
+				216E7B56E3174F36AB4D794A /* MainTabView.swift in Sources */,
+				A84E65AA5F70421D8DC88278 /* EqualizerSheet.swift in Sources */,
+				1A57C39129D64784A610F3B4 /* FullPlayerView.swift in Sources */,
+				68F5F616B90A42C2B72CB525 /* LyricsOverlayView.swift in Sources */,
+				D534DF25079640399E1CF249 /* MiniPlayerBar.swift in Sources */,
+				CA88F53F48B34B518FFC4E3F /* AchievementsSheet.swift in Sources */,
+				74CFD7DC8DAE4D6883756ED4 /* ProfileView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6FD7A1EA738940BDB32C9074 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDEFINED_VARIABLES = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F2052AE135744EE8BEBBCAA4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDEFINED_VARIABLES = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = "wholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA80AD0ADDF54491BB1F16AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LifonMusic/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LifonMUSIC;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifon.music;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		63416C62AB334EBE930A8CF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LifonMusic/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LifonMUSIC;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifon.music;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9165723EDDAB417CBF0370B1 /* Build configuration list for PBXProject "LifonMusic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6FD7A1EA738940BDB32C9074 /* Debug */,
+				F2052AE135744EE8BEBBCAA4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC242AC3CAD54EB4ABB5296F /* Build configuration list for PBXNativeTarget "LifonMusic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA80AD0ADDF54491BB1F16AB /* Debug */,
+				63416C62AB334EBE930A8CF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = EEC89329473848AE9B74FB40 /* Project object */;
+}

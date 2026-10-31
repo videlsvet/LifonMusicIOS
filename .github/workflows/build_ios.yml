@@ -1,0 +1,46 @@
+name: Build iOS App (.ipa)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build IPA
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Build unsigned .app
+        run: |
+          xcodebuild clean build \
+            -project LifonMusic.xcodeproj \
+            -scheme LifonMusic \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            BUILD_DIR="build"
+
+      - name: Create .ipa package
+        run: |
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/LifonMusic.app Payload/
+          zip -r LifonMusic.ipa Payload
+          rm -rf Payload
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LifonMusic-iOS-IPA
+          path: LifonMusic.ipa
+          retention-days: 14
