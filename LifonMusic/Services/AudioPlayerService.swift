@@ -134,7 +134,7 @@ public final class AudioPlayerService: ObservableObject {
             object: playerItem,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.handleTrackEnded()
             }
         }
@@ -142,20 +142,22 @@ public final class AudioPlayerService: ObservableObject {
         // Time observer (4 updates per second is ideal for smooth slider & lyrics)
         let interval = CMTime(seconds: 0.25, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
         timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            guard let self = self else { return }
-            let curSec = CMTimeGetSeconds(time)
-            if !curSec.isNaN && !curSec.isInfinite {
-                self.currentTimeMs = Int64(curSec * 1000)
-            }
-
-            if let dur = self.player?.currentItem?.duration {
-                let durSec = CMTimeGetSeconds(dur)
-                if !durSec.isNaN && !durSec.isInfinite {
-                    self.durationMs = Int64(durSec * 1000)
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                let curSec = CMTimeGetSeconds(time)
+                if !curSec.isNaN && !curSec.isInfinite {
+                    self.currentTimeMs = Int64(curSec * 1000)
                 }
-            }
 
-            self.updateNowPlayingPlaybackInfo()
+                if let dur = self.player?.currentItem?.duration {
+                    let durSec = CMTimeGetSeconds(dur)
+                    if !durSec.isNaN && !durSec.isInfinite {
+                        self.durationMs = Int64(durSec * 1000)
+                    }
+                }
+
+                self.updateNowPlayingPlaybackInfo()
+            }
         }
 
         player?.play()

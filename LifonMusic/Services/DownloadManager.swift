@@ -95,6 +95,7 @@ public final class DownloadManager: ObservableObject {
                     }
                 }
 
+                let resolvedCover = coverFileName
                 await MainActor.run {
                     let meta = DownloadedTrackMeta(
                         id: track.id,
@@ -103,14 +104,14 @@ public final class DownloadManager: ObservableObject {
                         duration: track.duration,
                         albumId: track.albumId,
                         audioFileName: "track_\(track.id).mp3",
-                        coverFileName: coverFileName
+                        coverFileName: resolvedCover
                     )
                     self.saveTrackMeta(meta)
                     self.statuses[track.id] = .done
                 }
             } catch {
                 await MainActor.run {
-                    self.statuses[track.id] = .none
+                    self.statuses[track.id] = DownloadStatus.none
                 }
             }
         }
@@ -123,7 +124,7 @@ public final class DownloadManager: ObservableObject {
         try? fileManager.removeItem(at: coverDest)
 
         downloadedTracks.removeAll { $0.id == trackId }
-        statuses[trackId] = .none
+        statuses[trackId] = DownloadStatus.none
         persistMetadata()
     }
 
