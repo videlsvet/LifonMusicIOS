@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build IPA
@@ -15,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
@@ -33,13 +38,17 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             BUILD_DIR="build" 2>&1 | tee xcodebuild.log
 
-      - name: Report Build Logs on Failure
+      - name: Save errors to branch on failure
         if: failure()
         run: |
-          echo "### ❌ Xcode Build Failed" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 60 xcodebuild.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -B build-logs
+          echo "=== XCODEBUILD LOG ===" > build_errors.txt
+          grep -E -C 3 "error:|BUILD FAILED" xcodebuild.log >> build_errors.txt || tail -n 100 xcodebuild.log >> build_errors.txt
+          git add build_errors.txt
+          git commit -m "Build error log"
+          git push origin build-logs --force
 
       - name: Create .ipa package
         run: |
@@ -54,10 +63,3 @@ jobs:
           name: LifonMusic-iOS-IPA
           path: LifonMusic.ipa
           retention-days: 14
-
-      - name: Upload Build Log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcodebuild-log
-          path: xcodebuild.log
