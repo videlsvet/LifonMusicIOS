@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 public struct ProfileView: View {
     @ObservedObject var appVm = AppViewModel.shared
