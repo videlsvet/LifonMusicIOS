@@ -26,6 +26,9 @@ public struct MainTabView: View {
                         FavoritesView()
                             .tag(AppScreen.favorites)
 
+                        PlaylistsView()
+                            .tag(AppScreen.playlists)
+
                         ProfileView()
                             .tag(AppScreen.profile)
                     }
@@ -52,6 +55,9 @@ public struct MainTabView: View {
         }
         .fullScreenCover(isPresented: $appVm.showFullPlayer) {
             FullPlayerView()
+        }
+        .sheet(isPresented: $appVm.showPlaylistPickerSheet) {
+            PlaylistPickerSheet(track: appVm.playlistPickerTrack)
         }
         .sheet(isPresented: $appVm.showEqualizer) {
             EqualizerSheet()
@@ -82,12 +88,18 @@ public struct MainTabView: View {
             )
 
             tabButton(
+                screen: .playlists,
+                title: "Плейлисты",
+                icon: "music.note.list"
+            )
+
+            tabButton(
                 screen: .profile,
                 title: "Профиль",
                 icon: "person.fill"
             )
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
@@ -98,7 +110,7 @@ public struct MainTabView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 18)
     }
 
     private func tabButton(screen: AppScreen, title: String, icon: String) -> some View {
@@ -110,11 +122,11 @@ public struct MainTabView: View {
         }) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 19))
+                    .font(.system(size: 18))
                     .foregroundColor(isSelected ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.35))
 
                 Text(title)
-                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
+                    .font(.system(size: 10, weight: isSelected ? .bold : .medium))
                     .foregroundColor(isSelected ? .white : .white.opacity(0.35))
             }
             .frame(maxWidth: .infinity)

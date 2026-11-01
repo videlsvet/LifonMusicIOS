@@ -1,9 +1,13 @@
 import SwiftUI
 import UIKit
+import PhotosUI
 
 public struct ProfileView: View {
     @ObservedObject var appVm = AppViewModel.shared
     @State private var showAchievementsSheet = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
+
+    public init() {}
 
     public var body: some View {
         NavigationStack {
@@ -21,20 +25,14 @@ public struct ProfileView: View {
 
                         // User Card
                         HStack(spacing: 16) {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(red: 0.91, green: 0.835, blue: 1.0), Color(red: 0.5, green: 0.35, blue: 0.8)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 58, height: 58)
-                                .overlay(
-                                    Text(String(appVm.username?.prefix(1).uppercased() ?? "L"))
-                                        .font(.system(size: 24, weight: .black))
-                                        .foregroundColor(.black)
-                                )
+                            if appVm.isAuthenticated {
+                                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                                    avatarView
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                avatarView
+                            }
 
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(appVm.username ?? "Гость")
@@ -85,7 +83,7 @@ public struct ProfileView: View {
                                             .font(.system(size: 12, weight: .medium))
                                             .foregroundColor(.white.opacity(0.5))
                                     }
-                                    let totalMin = (appVm.stats?.totalMs ?? 0) / 60_000
+                                    let totalMin = appVm.serverMinutes ?? ((appVm.stats?.totalMs ?? 0) / 60_000)
                                     let hours = totalMin / 60
                                     let mins = totalMin % 60
                                     Text(hours > 0 ? "\(hours) ч \(mins) мин" : "\(mins) мин")
@@ -130,32 +128,104 @@ public struct ProfileView: View {
                                     VStack(spacing: 6) {
                                         ForEach(Array(top.prefix(5).enumerated()), id: \.element.trackId) { idx, item in
                                             let track = appVm.allTracks.first(where: { $0.id == item.trackId })
-                                            HStack(spacing: 12) {
-                                                Text("#\(idx + 1)")
-                                                    .font(.system(size: 14, weight: .black, design: .monospaced))
-                                                    .foregroundColor(idx == 0 ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.4))
-                                                    .frame(width: 28, alignment: .leading)
-
-                                                VStack(alignment: .leading, spacing: 2) {
-                                                    Text(track?.title ?? "Трек #\(item.trackId)")
-                                                        .font(.system(size: 14, weight: .semibold))
-                                                        .foregroundColor(.white)
-                                                        .lineLimit(1)
-                                                    Text("\(item.playCount) прослушиваний")
-                                                        .font(.system(size: 12))
-                                                        .foregroundColor(.white.opacity(0.4))
+                                            let album = appVm.albumForTrack(track)
+                                            Button(action: {
+                                                if let t = track {
+                                                    appVm.playTrack(t, in: .allTracks)
                                                 }
+                                            }) {
+                                                HStack(spacing: 12) {
+                                                    Text("#\(idx + 1)")
+                                                        .font(.system(size: 14, weight: .black, design: .monospaced))
+                                                        .foregroundColor(idx == 0 ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.4))
+                                                        .frame(width: 28, alignment: .leading)
 
-                                                Spacer()
+                                                    if let cover = track?.coverUrl ?? album?.coverUrl, let url = URL(string: cover) {
+                                                        AsyncImage(url: url) { phase in
+                                                            switch phase {
+                                                            case .success(let img):
+                                                                img.resizable().aspectRatio(contentMode: .fill)
+                                                            default:
+                                                                Color.white.opacity(0.1)
+                                                            }
+                                                        }
+                                                        .frame(width: 36, height: 36)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                                                    }
+
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text(track?.title ?? "Трек #\(item.trackId)")
+                                                            .font(.system(size: 14, weight: .semibold))
+                                                            .foregroundColor(.white)
+                                                            .lineLimit(1)
+                                                        Text("\(item.playCount) прослушиваний")
+                                                            .font(.system(size: 12))
+                                                            .foregroundColor(.white.opacity(0.4))
+                                                    }
+
+                                                    Spacer()
+
+                                                    Image(systemName: "play.circle.fill")
+                                                        .font(.system(size: 18))
+                                                        .foregroundColor(.white.opacity(0.35))
+                                                }
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 8)
                                             }
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 8)
+                                            .buttonStyle(.plain)
                                         }
                                     }
                                     .background(Color.white.opacity(0.03))
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     .padding(.horizontal, 16)
                                 }
+                            }
+                        }
+
+                        // Supporters Section ("СПАСИБО ЗА ПОДДЕРЖКУ")
+                        if !appVm.supporters.isEmpty {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("СПАСИБО ЗА ПОДДЕРЖКУ")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.white.opacity(0.35))
+                                    .tracking(2)
+                                    .padding(.horizontal, 16)
+
+                                VStack(spacing: 8) {
+                                    ForEach(appVm.supporters) { sup in
+                                        let chipColor = Color(hex: sup.color)
+                                        HStack(spacing: 12) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(chipColor.opacity(0.2))
+                                                    .frame(width: 32, height: 32)
+                                                    .overlay(
+                                                        Circle().stroke(chipColor.opacity(0.4), lineWidth: 1)
+                                                    )
+                                                Text(String(sup.name.prefix(1).uppercased()))
+                                                    .font(.system(size: 13, weight: .bold))
+                                                    .foregroundColor(chipColor)
+                                            }
+
+                                            Text(sup.name)
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundColor(.white.opacity(0.85))
+
+                                            Spacer()
+
+                                            if !sup.handle.isEmpty {
+                                                Text(sup.handle)
+                                                    .font(.system(size: 12, design: .monospaced))
+                                                    .foregroundColor(.white.opacity(0.35))
+                                            }
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color.white.opacity(0.04))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    }
+                                }
+                                .padding(.horizontal, 16)
                             }
                         }
 
@@ -211,9 +281,80 @@ public struct ProfileView: View {
                 .sheet(isPresented: $showAchievementsSheet) {
                     AchievementsSheet()
                 }
+                .onChange(of: selectedPhotoItem) { newItem in
+                    guard let item = newItem else { return }
+                    Task {
+                        if let data = try? await item.loadTransferable(type: Data.self) {
+                            await appVm.uploadAvatar(imageData: data)
+                        }
+                    }
+                }
             }
             .navigationBarHidden(true)
         }
+    }
+
+    private var avatarView: some View {
+        ZStack {
+            if appVm.isUploadingAvatar {
+                Circle()
+                    .fill(Color.white.opacity(0.1))
+                    .frame(width: 58, height: 58)
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+            } else if let urlStr = appVm.avatarUrl, let url = URL(string: urlStr) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let img):
+                        img.resizable().aspectRatio(contentMode: .fill)
+                    default:
+                        placeholderAvatar
+                    }
+                }
+                .frame(width: 58, height: 58)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+            } else {
+                placeholderAvatar
+            }
+        }
+    }
+
+    private var placeholderAvatar: some View {
+        Circle()
+            .fill(
+                LinearGradient(
+                    colors: [Color(red: 0.91, green: 0.835, blue: 1.0), Color(red: 0.5, green: 0.35, blue: 0.8)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 58, height: 58)
+            .overlay(
+                Text(String(appVm.username?.prefix(1).uppercased() ?? "L"))
+                    .font(.system(size: 24, weight: .black))
+                    .foregroundColor(.black)
+            )
+    }
+}
+
+private extension Color {
+    init(hex: String) {
+        let clean = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: clean).scanHexInt64(&int)
+        let r, g, b: UInt64
+        switch clean.count {
+        case 6:
+            (r, g, b) = ((int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
+        default:
+            (r, g, b) = (139, 92, 246)
+        }
+        self.init(
+            red: Double(r) / 255.0,
+            green: Double(g) / 255.0,
+            blue: Double(b) / 255.0
+        )
     }
 }
 

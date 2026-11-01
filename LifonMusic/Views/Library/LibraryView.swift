@@ -165,7 +165,16 @@ public struct LibraryView: View {
                                 }
                             }
                         } else {
+                            // "Волна" Hero Card
+                            WaveHeroCard()
+
                             // Standard Library (All Albums Grid)
+                            Text("Альбомы и синглы")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 4)
+
                             LazyVGrid(columns: gridColumns, spacing: 16) {
                                 ForEach(appVm.albums) { album in
                                     NavigationLink(destination: AlbumDetailView(album: album)) {

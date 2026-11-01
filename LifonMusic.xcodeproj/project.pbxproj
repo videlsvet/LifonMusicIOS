@@ -41,6 +41,11 @@
 		BDEE46AA34C440B29A57E2FC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29FCA3A01484CE1A8F7A3A8 /* ProfileView.swift */; };
 		6B1C80BFEC2E42ADA049AFBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43F4540BE3F54AEF93E92D3F /* Assets.xcassets */; };
 		284729DD801D41DA97960329 /* Lyrics in Resources */ = {isa = PBXBuildFile; fileRef = EF0EB4CDFDB74D7688AE2819 /* Lyrics */; };
+		B00100010001000100000001 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100010001000100000001 /* Playlist.swift */; };
+		B00100010001000100000002 /* VibeWaveCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100010001000100000002 /* VibeWaveCanvas.swift */; };
+		B00100010001000100000003 /* WaveHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100010001000100000003 /* WaveHeroCard.swift */; };
+		B00100010001000100000004 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100010001000100000004 /* PlaylistsView.swift */; };
+		B00100010001000100000005 /* PlaylistPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100010001000100000005 /* PlaylistPickerSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +85,11 @@
 		EF0EB4CDFDB74D7688AE2819 /* Lyrics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/Lyrics"; sourceTree = "<group>"; };
 		5D8BFA39ABC84079A3F50637 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Resources/Info.plist"; sourceTree = "<group>"; };
 		67FE33CE245B45CBA1951C21 /* LifonMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifonMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00100010001000100000001 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Playlist.swift"; sourceTree = "<group>"; };
+		A00100010001000100000002 /* VibeWaveCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Components/VibeWaveCanvas.swift"; sourceTree = "<group>"; };
+		A00100010001000100000003 /* WaveHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Library/WaveHeroCard.swift"; sourceTree = "<group>"; };
+		A00100010001000100000004 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Playlists/PlaylistsView.swift"; sourceTree = "<group>"; };
+		A00100010001000100000005 /* PlaylistPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Playlists/PlaylistPickerSheet.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +157,11 @@
 				43F4540BE3F54AEF93E92D3F /* Assets.xcassets */,
 				EF0EB4CDFDB74D7688AE2819 /* Lyrics */,
 				5D8BFA39ABC84079A3F50637 /* Info.plist */,
+				A00100010001000100000001 /* Playlist.swift */,
+				A00100010001000100000002 /* VibeWaveCanvas.swift */,
+				A00100010001000100000003 /* WaveHeroCard.swift */,
+				A00100010001000100000004 /* PlaylistsView.swift */,
+				A00100010001000100000005 /* PlaylistPickerSheet.swift */,
 			);
 			path = LifonMusic;
 			sourceTree = "<group>";
@@ -253,6 +268,11 @@
 				7CD650CBD8164D1B8532E90C /* MiniPlayerBar.swift in Sources */,
 				71C6AEB1F7884C5E88F5E32F /* AchievementsSheet.swift in Sources */,
 				BDEE46AA34C440B29A57E2FC /* ProfileView.swift in Sources */,
+				B00100010001000100000001 /* Playlist.swift in Sources */,
+				B00100010001000100000002 /* VibeWaveCanvas.swift in Sources */,
+				B00100010001000100000003 /* WaveHeroCard.swift in Sources */,
+				B00100010001000100000004 /* PlaylistsView.swift in Sources */,
+				B00100010001000100000005 /* PlaylistPickerSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

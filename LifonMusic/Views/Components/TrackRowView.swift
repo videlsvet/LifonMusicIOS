@@ -112,6 +112,22 @@ public struct TrackRowView: View {
         .onTapGesture {
             onPlay()
         }
+        .contextMenu {
+            Button(action: onPlay) {
+                Label("Слушать", systemImage: "play.fill")
+            }
+            Button(action: onToggleLike) {
+                Label(isLiked ? "Удалить из избранного" : "В избранное", systemImage: isLiked ? "heart.slash" : "heart")
+            }
+            Button(action: {
+                AppViewModel.shared.openPlaylistPicker(for: track)
+            }) {
+                Label("Добавить в плейлист...", systemImage: "text.badge.plus")
+            }
+            Button(action: onDownload) {
+                Label(downloadStatus == .done ? "Удалить загрузку" : "Скачать", systemImage: downloadStatus == .done ? "trash" : "arrow.down.circle")
+            }
+        }
     }
 
     private var placeholderBox: some View {

@@ -45,7 +45,7 @@ public struct FullPlayerView: View {
                         Spacer()
 
                         VStack(spacing: 2) {
-                            Text("ИГРАЕТ ИЗ ДИСКОГРАФИИ")
+                            Text(player.playContext == .wave ? "ИГРАЕТ ВОЛНА" : "ИГРАЕТ ИЗ ДИСКОГРАФИИ")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.white.opacity(0.4))
                                 .tracking(1)
@@ -126,7 +126,7 @@ public struct FullPlayerView: View {
 
                 Spacer(minLength: 16)
 
-                // Track Info & Actions (Like, Lyrics, Download)
+                // Track Info & Actions (Like, Add to Playlist, Lyrics, Download)
                 if let track = player.currentTrack {
                     VStack(spacing: 20) {
                         HStack(alignment: .center) {
@@ -153,6 +153,16 @@ public struct FullPlayerView: View {
                                 Image(systemName: showLyrics ? "quote.bubble.fill" : "quote.bubble")
                                     .font(.system(size: 20))
                                     .foregroundColor(showLyrics ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.6))
+                                    .padding(8)
+                            }
+
+                            // Add to playlist button
+                            Button(action: {
+                                appVm.openPlaylistPicker(for: track)
+                            }) {
+                                Image(systemName: "text.badge.plus")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white.opacity(0.6))
                                     .padding(8)
                             }
 

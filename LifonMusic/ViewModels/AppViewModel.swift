@@ -5,6 +5,7 @@ import Combine
 public enum AppScreen: Hashable {
     case library
     case favorites
+    case playlists
     case profile
 }
 
@@ -30,11 +31,31 @@ public final class AppViewModel: ObservableObject {
     @Published public var showFullPlayer: Bool = false
     @Published public var showAuth: Bool = false
 
+    // Auth & Profile
     @Published public var authToken: String?
     @Published public var username: String?
+    @Published public var avatarUrl: String?
+    @Published public var isUploadingAvatar: Bool = false
+    @Published public var serverMinutes: Int64?
     @Published public var stats: StatsResult?
     @Published public var achievements: [Achievement] = []
     @Published public var myAchievements: [UserAchievement] = []
+    @Published public var supporters: [Supporter] = []
+
+    // Wave Mode
+    @Published public var isWaveActive: Bool = false
+    @Published public var isLoadingWave: Bool = false
+    @Published public var waveTracks: [Track] = []
+
+    // Playlists
+    @Published public var playlists: [UserPlaylist] = []
+    @Published public var selectedPlaylist: UserPlaylist?
+    @Published public var selectedPlaylistTracks: [Track] = []
+    @Published public var isLoadingPlaylists: Bool = false
+    @Published public var playlistsError: String?
+    @Published public var showCreatePlaylistDialog: Bool = false
+    @Published public var showPlaylistPickerSheet: Bool = false
+    @Published public var playlistPickerTrack: Track?
 
     public let playerService = AudioPlayerService.shared
     public let downloadManager = DownloadManager.shared
@@ -43,6 +64,7 @@ public final class AppViewModel: ObservableObject {
     private var pingTimer: AnyCancellable?
     private let tokenKey = "auth_token"
     private let usernameKey = "auth_username"
+    private let avatarKey = "auth_avatar_url"
     private let likedKey = "liked_tracks_set"
     private let disclaimerKey = "disclaimer_shown"
     private let lastBroadcastIdKey = "last_broadcast_id"
@@ -50,18 +72,27 @@ public final class AppViewModel: ObservableObject {
     private init() {
         self.authToken = UserDefaults.standard.string(forKey: tokenKey)
         self.username = UserDefaults.standard.string(forKey: usernameKey)
+        self.avatarUrl = UserDefaults.standard.string(forKey: avatarKey)
         self.showDisclaimer = !UserDefaults.standard.bool(forKey: disclaimerKey)
 
         if let savedLikes = UserDefaults.standard.array(forKey: likedKey) as? [Int] {
             self.likedTracks = Set(savedLikes)
         }
 
-        playerService.onTrackChanged = { [weak self] _ in
-            // Handle any side effects on track change
+        playerService.onTrackChanged = { [weak self] track in
+            if let track = track, self?.playerService.playContext != .wave {
+                self?.isWaveActive = false
+            }
         }
 
         playerService.onLikeToggled = { [weak self] trackId in
             self?.toggleLike(trackId: trackId)
+        }
+
+        playerService.onNeedMoreWaveTracks = { [weak self] in
+            Task { [weak self] in
+                await self?.loadMoreWaveTracks()
+            }
         }
 
         startPingTimer()
@@ -71,8 +102,11 @@ public final class AppViewModel: ObservableObject {
         await loadCatalog()
         await refreshLikes()
         await checkBroadcastNotification()
+        await loadSupporters()
         if isAuthenticated {
             await loadProfileData()
+            await loadPlaylists()
+            await syncRemotePlaybackOnLaunch()
         }
     }
 
@@ -104,6 +138,100 @@ public final class AppViewModel: ObservableObject {
             }
             print("Catalog error: \(err)")
         }
+    }
+
+    // MARK: - Wave ("Моя волна")
+    public func toggleWave() async {
+        if isWaveActive && playerService.isPlaying {
+            playerService.pause()
+        } else if isWaveActive && !playerService.isPlaying {
+            playerService.play()
+        } else {
+            await startWave()
+        }
+    }
+
+    public func startWave() async {
+        isLoadingWave = true
+        if let tracks = await ApiClient.shared.fetchWaveTracks(), !tracks.isEmpty {
+            self.waveTracks = tracks
+            self.isWaveActive = true
+            if let first = tracks.first {
+                playerService.playTrack(first, in: tracks, context: .wave)
+            }
+        } else {
+            // Fallback: shuffle all catalog tracks
+            let fallback = allTracks.shuffled()
+            if let first = fallback.first {
+                self.waveTracks = fallback
+                self.isWaveActive = true
+                playerService.playTrack(first, in: fallback, context: .wave)
+            }
+        }
+        isLoadingWave = false
+    }
+
+    private func loadMoreWaveTracks() async {
+        if let more = await ApiClient.shared.fetchWaveTracks() {
+            self.waveTracks = more
+        }
+    }
+
+    // MARK: - Playlists
+    public func loadPlaylists() async {
+        guard let token = authToken, isAuthenticated else {
+            self.playlists = []
+            return
+        }
+        isLoadingPlaylists = true
+        playlistsError = nil
+        let list = await ApiClient.shared.fetchPlaylists(token: token)
+        self.playlists = list
+        isLoadingPlaylists = false
+    }
+
+    public func createPlaylist(title: String) async -> UserPlaylist? {
+        guard let token = authToken, isAuthenticated else { return nil }
+        if let created = await ApiClient.shared.createPlaylist(token: token, title: title) {
+            await loadPlaylists()
+            return created
+        }
+        return nil
+    }
+
+    public func deletePlaylist(_ playlist: UserPlaylist) async {
+        guard let token = authToken, isAuthenticated else { return }
+        let ok = await ApiClient.shared.deletePlaylist(token: token, publicId: playlist.publicId)
+        if ok {
+            if selectedPlaylist?.publicId == playlist.publicId {
+                selectedPlaylist = nil
+                selectedPlaylistTracks = []
+            }
+            await loadPlaylists()
+        }
+    }
+
+    public func selectPlaylist(_ playlist: UserPlaylist) async {
+        self.selectedPlaylist = playlist
+        let ids = await ApiClient.shared.fetchPlaylistTracks(publicId: playlist.publicId)
+        let map = Dictionary(uniqueKeysWithValues: allTracks.map { ($0.id, $0) })
+        self.selectedPlaylistTracks = ids.compactMap { map[$0] }
+    }
+
+    public func addTrackToPlaylist(playlist: UserPlaylist, trackId: Int) async {
+        guard let token = authToken, isAuthenticated else { return }
+        let ok = await ApiClient.shared.addTrackToPlaylist(token: token, publicId: playlist.publicId, trackId: trackId)
+        if ok {
+            if selectedPlaylist?.publicId == playlist.publicId {
+                await selectPlaylist(playlist)
+            }
+            await loadPlaylists()
+        }
+    }
+
+    public func openPlaylistPicker(for track: Track) {
+        self.playlistPickerTrack = track
+        self.showPlaylistPickerSheet = true
     }
 
     // MARK: - Likes
@@ -155,6 +283,10 @@ public final class AppViewModel: ObservableObject {
             playlist = downloadedTracksAsTracks
         case .allTracks:
             playlist = allTracks
+        case .playlist:
+            playlist = selectedPlaylistTracks
+        case .wave:
+            playlist = waveTracks
         }
         playerService.playTrack(track, in: playlist, context: context)
     }
@@ -190,17 +322,58 @@ public final class AppViewModel: ObservableObject {
         albums.first(where: { $0.id == id })
     }
 
+    // MARK: - Playback Sync on Launch
+    private func syncRemotePlaybackOnLaunch() async {
+        guard let token = authToken, isAuthenticated else { return }
+        if let remote = await ApiClient.shared.fetchPlaybackSync(token: token) {
+            if let targetTrack = allTracks.first(where: { $0.id == remote.trackId }) {
+                let alb = albumForTrack(targetTrack)
+                let list = alb?.tracks ?? [targetTrack]
+                // Prepare track position without auto-blasting sound if not actively playing
+                playerService.playTrack(targetTrack, in: list, context: .album, startPositionMs: remote.positionMs)
+                if !remote.isPlaying {
+                    playerService.pause()
+                }
+            }
+        }
+    }
+
     // MARK: - Profile & Achievements
     public func loadProfileData() async {
         guard let token = authToken, isAuthenticated else { return }
+        async let profileTask = ApiClient.shared.fetchProfileDetails(token: token)
         async let statsTask = ApiClient.shared.fetchStats(token: token)
         async let achievementsTask = ApiClient.shared.fetchAllAchievements()
         async let myAchievementsTask = ApiClient.shared.fetchMyAchievements(token: token)
 
-        let (s, allAch, myAch) = await (statsTask, achievementsTask, myAchievementsTask)
+        let (prof, s, allAch, myAch) = await (profileTask, statsTask, achievementsTask, myAchievementsTask)
+        if let uname = prof.username, !uname.isEmpty {
+            self.username = uname
+            UserDefaults.standard.set(uname, forKey: usernameKey)
+        }
+        if let aUrl = prof.avatarUrl {
+            self.avatarUrl = aUrl
+            UserDefaults.standard.set(aUrl, forKey: avatarKey)
+        }
+        self.serverMinutes = prof.listenMs.map { $0 / 60_000 }
         self.stats = s
         self.achievements = allAch
         self.myAchievements = myAch
+    }
+
+    public func uploadAvatar(imageData: Data) async {
+        guard let token = authToken, isAuthenticated else { return }
+        isUploadingAvatar = true
+        if let newUrl = await ApiClient.shared.uploadAvatar(token: token, imageData: imageData) {
+            self.avatarUrl = newUrl
+            UserDefaults.standard.set(newUrl, forKey: avatarKey)
+        }
+        isUploadingAvatar = false
+    }
+
+    public func loadSupporters() async {
+        let supps = await ApiClient.shared.fetchSupporters()
+        self.supporters = supps
     }
 
     public func setAuthToken(token: String, username: String) {
@@ -210,6 +383,7 @@ public final class AppViewModel: ObservableObject {
         UserDefaults.standard.set(username, forKey: usernameKey)
         Task {
             await refreshLikes()
+            await loadPlaylists()
             await loadProfileData()
         }
     }
@@ -217,10 +391,14 @@ public final class AppViewModel: ObservableObject {
     public func logout() {
         self.authToken = nil
         self.username = nil
+        self.avatarUrl = nil
         UserDefaults.standard.removeObject(forKey: tokenKey)
         UserDefaults.standard.removeObject(forKey: usernameKey)
+        UserDefaults.standard.removeObject(forKey: avatarKey)
         self.stats = nil
         self.myAchievements = []
+        self.playlists = []
+        self.selectedPlaylist = nil
     }
 
     public func dismissDisclaimer() {

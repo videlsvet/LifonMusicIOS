@@ -10,6 +10,8 @@ public enum PlayContext: Equatable {
     case favorites
     case downloaded
     case allTracks
+    case wave
+    case playlist
 }
 
 @MainActor
@@ -36,12 +38,14 @@ public final class AudioPlayerService: ObservableObject {
     private var activeQueue: [Track] = []
     private var currentQueueIndex: Int = 0
 
-    // Listen tracker metrics
+    // Listen tracker & sync metrics
     private var trackStartTime: Date?
     private var accumulatedPlayTimeMs: Int64 = 0
+    private var lastSyncTimeMs: Int64 = 0
 
     public var onTrackChanged: ((Track?) -> Void)?
     public var onLikeToggled: ((Int) -> Void)?
+    public var onNeedMoreWaveTracks: (() -> Void)?
 
     private init() {
         setupAudioSession()
@@ -59,7 +63,7 @@ public final class AudioPlayerService: ObservableObject {
     }
 
     // MARK: - Playback Control
-    public func playTrack(_ track: Track, in playlist: [Track], context: PlayContext = .album) {
+    public func playTrack(_ track: Track, in playlist: [Track], context: PlayContext = .album, startPositionMs: Int64 = 0) {
         self.playContext = context
         self.currentPlaylist = playlist
         recomputeQueue()
@@ -71,7 +75,7 @@ public final class AudioPlayerService: ObservableObject {
             currentQueueIndex = 0
         }
 
-        startPlayback(for: track)
+        startPlayback(for: track, startPositionMs: startPositionMs)
     }
 
     private func recomputeQueue() {
@@ -88,15 +92,16 @@ public final class AudioPlayerService: ObservableObject {
         }
     }
 
-    private func startPlayback(for track: Track) {
+    private func startPlayback(for track: Track, startPositionMs: Int64 = 0) {
         // Record previous listen if applicable
         finalizeListenTracking()
 
         self.currentTrack = track
-        self.currentTimeMs = 0
+        self.currentTimeMs = startPositionMs
         self.durationMs = 0
         self.trackStartTime = Date()
         self.accumulatedPlayTimeMs = 0
+        self.lastSyncTimeMs = startPositionMs
 
         // Determine audio source: local download or remote URL
         let audioUrl: URL?
@@ -128,6 +133,11 @@ public final class AudioPlayerService: ObservableObject {
             player?.replaceCurrentItem(with: playerItem)
         }
 
+        if startPositionMs > 0 {
+            let targetTime = CMTime(seconds: Double(startPositionMs) / 1000.0, preferredTimescale: 1000)
+            player?.seek(to: targetTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        }
+
         // Attach end notification
         itemEndObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
@@ -157,12 +167,17 @@ public final class AudioPlayerService: ObservableObject {
                 }
 
                 self.updateNowPlayingPlaybackInfo()
+
+                if abs(self.currentTimeMs - self.lastSyncTimeMs) > 12_000 {
+                    self.syncPlaybackState()
+                }
             }
         }
 
         player?.play()
         self.isPlaying = true
         self.onTrackChanged?(track)
+        self.syncPlaybackState()
 
         // Update glow background
         Task {
@@ -194,6 +209,7 @@ public final class AudioPlayerService: ObservableObject {
         isPlaying = true
         trackStartTime = Date()
         updateNowPlayingPlaybackInfo()
+        syncPlaybackState()
     }
 
     public func pause() {
@@ -204,6 +220,7 @@ public final class AudioPlayerService: ObservableObject {
             trackStartTime = nil
         }
         updateNowPlayingPlaybackInfo()
+        syncPlaybackState()
     }
 
     public func seek(to ms: Int64) {
@@ -213,6 +230,7 @@ public final class AudioPlayerService: ObservableObject {
         player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
             Task { @MainActor in
                 self?.updateNowPlayingPlaybackInfo()
+                self?.syncPlaybackState()
             }
         }
     }
@@ -222,6 +240,10 @@ public final class AudioPlayerService: ObservableObject {
         if currentQueueIndex + 1 < activeQueue.count {
             currentQueueIndex += 1
             startPlayback(for: activeQueue[currentQueueIndex])
+        } else if playContext == .wave {
+            onNeedMoreWaveTracks?()
+            currentQueueIndex = 0
+            startPlayback(for: activeQueue[0])
         } else if isRepeating {
             currentQueueIndex = 0
             startPlayback(for: activeQueue[0])
@@ -263,6 +285,20 @@ public final class AudioPlayerService: ObservableObject {
             play()
         } else {
             playNext()
+        }
+    }
+
+    private func syncPlaybackState() {
+        guard let track = currentTrack else { return }
+        lastSyncTimeMs = currentTimeMs
+        let pos = currentTimeMs
+        let playing = isPlaying
+        let trackId = track.id
+        Task {
+            if let token = UserDefaults.standard.string(forKey: "auth_token"),
+               !token.isEmpty, token != "guest" {
+                _ = await ApiClient.shared.savePlaybackSync(token: token, trackId: trackId, positionMs: pos, isPlaying: playing)
+            }
         }
     }
 
