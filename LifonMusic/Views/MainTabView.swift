@@ -52,15 +52,17 @@ public struct MainTabView: View {
                 }
                 .transition(.opacity)
             }
+
+            // FullPlayer — overlay (не fullScreenCover) чтобы видеть контент позади при свайпе вниз
+            if appVm.showFullPlayer {
+                FullPlayerView()
+                    .transition(.move(edge: .bottom))
+                    .zIndex(10)
+            }
         }
-        .fullScreenCover(isPresented: $appVm.showFullPlayer) {
-            FullPlayerView()
-        }
+        .animation(.spring(response: 0.38, dampingFraction: 0.88), value: appVm.showFullPlayer)
         .sheet(isPresented: $appVm.showPlaylistPickerSheet) {
             PlaylistPickerSheet(track: appVm.playlistPickerTrack)
-        }
-        .sheet(isPresented: $appVm.showEqualizer) {
-            EqualizerSheet()
         }
         .sheet(isPresented: $appVm.showCupsizeInfo) {
             CupsizeInfoSheet()

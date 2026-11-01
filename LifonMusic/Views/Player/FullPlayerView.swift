@@ -5,128 +5,96 @@ public struct FullPlayerView: View {
     @ObservedObject var appVm = AppViewModel.shared
     @StateObject private var lyricsVm = LyricsViewModel()
 
-    @Environment(\.dismiss) private var dismiss
-
     @State private var showLyrics: Bool = false
     @State private var isDraggingSlider: Bool = false
     @State private var dragSliderValue: Double = 0.0
 
-    // Gestures
-    @State private var dismissOffsetY: CGFloat = 0.0
-    @State private var carouselOffsetX: CGFloat = 0.0
-    @State private var activeDragAxis: DragAxis = .none
+    // Dismiss gesture
+    @GestureState private var dismissDragY: CGFloat = 0
+    @State private var dismissedY: CGFloat = 0
 
-    private enum DragAxis {
-        case none
-        case vertical
-        case horizontal
-    }
+    // Carousel gesture
+    @GestureState private var carouselDragX: CGFloat = 0
+    @State private var carouselCommittedX: CGFloat = 0  // 0 normally, snaps to ±1 when track changes
+
+    // Если true — идёт финальная анимация смены трека
+    @State private var isChangingTrack: Bool = false
 
     public init() {}
 
+    // Итоговое смещение вниз при свайпе закрытия
+    private var totalDismissY: CGFloat {
+        max(0, dismissDragY + dismissedY)
+    }
+
+    // Прозрачность плеера при свайпе вниз
+    private var playerOpacity: Double {
+        let raw = 1.0 - Double(totalDismissY / 500.0)
+        return max(0.0, min(1.0, raw))
+    }
+
     public var body: some View {
-        ZStack {
-            // Background Glow
-            Color(red: 0.05, green: 0.05, blue: 0.06).ignoresSafeArea()
+        GeometryReader { geo in
+            ZStack {
+                // Фон — немного прозрачный при свайпе, чтобы было видно что позади
+                Color(red: 0.05, green: 0.05, blue: 0.06)
+                    .opacity(playerOpacity)
+                    .ignoresSafeArea()
 
-            RadialGradient(
-                gradient: Gradient(colors: [player.playerGlowColor.opacity(0.40), Color.clear]),
-                center: .top,
-                startRadius: 40,
-                endRadius: 460
-            )
-            .ignoresSafeArea()
+                RadialGradient(
+                    gradient: Gradient(colors: [player.playerGlowColor.opacity(0.38), Color.clear]),
+                    center: .top,
+                    startRadius: 40,
+                    endRadius: 440
+                )
+                .opacity(playerOpacity)
+                .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Top Handle & Navigation Bar
-                topHeaderBar
+                VStack(spacing: 0) {
+                    topHeaderBar
+                        .padding(.top, geo.safeAreaInsets.top > 0 ? geo.safeAreaInsets.top + 4 : 16)
 
-                Spacer(minLength: 8)
+                    Spacer(minLength: 12)
 
-                // Middle: Cover Art Carousel OR Lyrics Overlay
-                if showLyrics {
-                    LyricsOverlayView(lyricsVm: lyricsVm) { seekMs in
-                        player.seek(to: seekMs)
-                    }
-                    .frame(maxHeight: .infinity)
-                    .transition(.opacity)
-                } else {
-                    coverCarouselArea
-                        .frame(maxHeight: 380)
+                    // Обложка или текст
+                    if showLyrics {
+                        LyricsOverlayView(lyricsVm: lyricsVm) { seekMs in
+                            player.seek(to: seekMs)
+                        }
+                        .frame(maxHeight: .infinity)
                         .transition(.opacity)
-                }
+                    } else {
+                        coverCarouselArea(geo: geo)
+                            .transition(.opacity)
+                    }
 
-                Spacer(minLength: 16)
+                    Spacer(minLength: 20)
 
-                // Track Info & Decluttered Action Controls
-                if let track = player.currentTrack {
-                    VStack(spacing: 22) {
-                        trackInfoAndMenuRow(track: track)
-
-                        scrubberSliderArea
-
-                        playbackControlsRow
+                    if let track = player.currentTrack {
+                        VStack(spacing: 20) {
+                            trackInfoAndMenuRow(track: track, geo: geo)
+                            scrubberSliderArea(geo: geo)
+                            playbackControlsRow(geo: geo)
+                        }
+                        .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? geo.safeAreaInsets.bottom + 4 : 24)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .offset(y: totalDismissY)
+            .opacity(playerOpacity)
+            // Жест закрытия (свайп вниз) — работает только по вертикали
+            .gesture(
+                dismissGesture
+            )
         }
-        .offset(y: dismissOffsetY)
-        .opacity(1.0 - Double(dismissOffsetY / 450.0).clamped(to: 0.0...0.65))
-        .gesture(
-            DragGesture(minimumDistance: 10)
-                .onChanged { value in
-                    if activeDragAxis == .none {
-                        if abs(value.translation.height) > abs(value.translation.width) {
-                            if value.translation.height > 0 {
-                                activeDragAxis = .vertical
-                            }
-                        } else if abs(value.translation.width) > 6 && !showLyrics {
-                            activeDragAxis = .horizontal
-                        }
-                    }
-
-                    if activeDragAxis == .vertical {
-                        dismissOffsetY = max(0, value.translation.height)
-                    } else if activeDragAxis == .horizontal {
-                        carouselOffsetX = value.translation.width * 0.85
-                    }
-                }
-                .onEnded { value in
-                    if activeDragAxis == .vertical {
-                        if dismissOffsetY > 110 || value.predictedEndTranslation.height > 260 {
-                            dismiss()
-                        } else {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                dismissOffsetY = 0
-                            }
-                        }
-                    } else if activeDragAxis == .horizontal {
-                        let threshold: CGFloat = 60
-                        if carouselOffsetX < -threshold && player.nextTrack != nil {
-                            withAnimation(.easeInOut(duration: 0.22)) {
-                                carouselOffsetX = -300
-                            }
-                            player.playNext()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
-                                carouselOffsetX = 0
-                            }
-                        } else if carouselOffsetX > threshold && player.previousTrack != nil {
-                            withAnimation(.easeInOut(duration: 0.22)) {
-                                carouselOffsetX = 300
-                            }
-                            player.playPrevious()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
-                                carouselOffsetX = 0
-                            }
-                        } else {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                carouselOffsetX = 0
-                            }
-                        }
-                    }
-                    activeDragAxis = .none
-                }
-        )
+        .ignoresSafeArea()
+        .sheet(isPresented: $appVm.showEqualizer) {
+            EqualizerSheet()
+        }
+        .sheet(isPresented: $appVm.showPlaylistPickerSheet) {
+            PlaylistPickerSheet(track: appVm.playlistPickerTrack)
+        }
         .onAppear {
             if let track = player.currentTrack {
                 lyricsVm.loadLyrics(for: track.id)
@@ -136,101 +104,171 @@ public struct FullPlayerView: View {
             if let t = newTrack {
                 lyricsVm.loadLyrics(for: t.id)
             }
+            // При смене трека сбрасываем смещение карусели
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                carouselCommittedX = 0
+            }
+            isChangingTrack = false
         }
     }
 
-    // MARK: - Top Header Bar
-    private var topHeaderBar: some View {
-        VStack(spacing: 12) {
-            Capsule()
-                .fill(Color.white.opacity(0.25))
-                .frame(width: 36, height: 4)
-                .padding(.top, 10)
+    // MARK: - Dismiss Gesture
 
-            HStack {
-                Button(action: { dismiss() }) {
+    private var dismissGesture: some Gesture {
+        DragGesture(minimumDistance: 12, coordinateSpace: .global)
+            .updating($dismissDragY) { value, state, _ in
+                // Только если движение преимущественно вертикальное вниз
+                let isVertical = abs(value.translation.height) > abs(value.translation.width)
+                if isVertical && value.translation.height > 0 {
+                    state = value.translation.height
+                }
+            }
+            .onEnded { value in
+                let isVertical = abs(value.translation.height) > abs(value.translation.width)
+                let bigEnough = value.translation.height > 100 || value.predictedEndTranslation.height > 250
+                if isVertical && bigEnough {
+                    // Закрываем плеер
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                        appVm.showFullPlayer = false
+                    }
+                } else {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                        dismissedY = 0
+                    }
+                }
+            }
+    }
+
+    // MARK: - Top Header Bar
+
+    private var topHeaderBar: some View {
+        VStack(spacing: 10) {
+            Capsule()
+                .fill(Color.white.opacity(0.22))
+                .frame(width: 34, height: 4)
+
+            HStack(spacing: 0) {
+                // Кнопка закрытия
+                Button(action: {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                        appVm.showFullPlayer = false
+                    }
+                }) {
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.white.opacity(0.75))
                         .frame(width: 40, height: 40)
-                        .background(Color.white.opacity(0.06))
+                        .background(Color.white.opacity(0.07))
                         .clipShape(Circle())
                 }
 
                 Spacer()
 
-                Button(action: {
-                    if let track = player.currentTrack, let album = appVm.albumForTrack(track) {
-                        dismiss()
+                // Центр: название альбома
+                if let track = player.currentTrack, let album = appVm.albumForTrack(track) {
+                    Button(action: {
+                        withAnimation {
+                            appVm.showFullPlayer = false
+                        }
                         appVm.currentScreen = .library
                         appVm.selectedAlbum = album
-                    }
-                }) {
-                    VStack(spacing: 2) {
-                        Text(player.playContext == .wave ? "ИГРАЕТ ВОЛНА" : "ИГРАЕТ ИЗ ДИСКОГРАФИИ")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.white.opacity(0.45))
-                            .tracking(1.2)
+                    }) {
+                        VStack(spacing: 2) {
+                            Text(player.playContext == .wave ? "ИГРАЕТ ВОЛНА" : "ИГРАЕТ ИЗ ДИСКОГРАФИИ")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white.opacity(0.40))
+                                .tracking(1.0)
 
-                        if let track = player.currentTrack, let album = appVm.albumForTrack(track) {
                             Text(album.title)
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(.white.opacity(0.85))
                                 .lineLimit(1)
                         }
                     }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 Spacer()
 
+                // Эквалайзер
                 Button(action: { appVm.showEqualizer = true }) {
                     Image(systemName: "slider.vertical.3")
                         .font(.system(size: 17, weight: .medium))
                         .foregroundColor(.white.opacity(0.75))
                         .frame(width: 40, height: 40)
-                        .background(Color.white.opacity(0.06))
+                        .background(Color.white.opacity(0.07))
                         .clipShape(Circle())
                 }
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 20)
         }
     }
 
     // MARK: - Cover Carousel with "Ears"
-    private var coverCarouselArea: some View {
-        GeometryReader { geo in
-            let cardSize = min(geo.size.width - 76, geo.size.height - 20)
-            let stepWidth = cardSize + 20
 
-            ZStack {
-                // Previous Track Ear (Left)
-                if let prev = player.previousTrack {
-                    coverCard(track: prev, size: cardSize, slotX: -stepWidth, stepWidth: stepWidth)
-                }
+    @ViewBuilder
+    private func coverCarouselArea(geo: GeometryProxy) -> some View {
+        let hPad: CGFloat = 40
+        let cardSize = min(geo.size.width - hPad * 2, geo.size.height * 0.40)
+        let stepWidth = cardSize + 24
 
-                // Next Track Ear (Right)
-                if let next = player.nextTrack {
-                    coverCard(track: next, size: cardSize, slotX: stepWidth, stepWidth: stepWidth)
-                }
+        ZStack {
+            if let prev = player.previousTrack {
+                coverCard(track: prev, size: cardSize, slotX: -stepWidth, stepWidth: stepWidth)
+            }
+            if let next = player.nextTrack {
+                coverCard(track: next, size: cardSize, slotX: stepWidth, stepWidth: stepWidth)
+            }
+            if let current = player.currentTrack {
+                coverCard(track: current, size: cardSize, slotX: 0, stepWidth: stepWidth)
+            }
+        }
+        .frame(width: geo.size.width, height: cardSize + 20)
+        .clipped()
+        // Горизонтальный жест карусели — отдельный от вертикального dismiss
+        .gesture(carouselGesture(stepWidth: stepWidth))
+    }
 
-                // Current Center Track
-                if let current = player.currentTrack {
-                    coverCard(track: current, size: cardSize, slotX: 0, stepWidth: stepWidth)
+    private func carouselGesture(stepWidth: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 10, coordinateSpace: .local)
+            .updating($carouselDragX) { value, state, _ in
+                // Только горизонтальные свайпы
+                if !isChangingTrack && abs(value.translation.width) > abs(value.translation.height) {
+                    state = value.translation.width * 0.88
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        }
+            .onEnded { value in
+                guard !isChangingTrack else { return }
+                let isHorizontal = abs(value.translation.width) > abs(value.translation.height)
+                guard isHorizontal else { return }
+
+                let threshold: CGFloat = 55
+                let velocity = value.predictedEndTranslation.width
+
+                if (value.translation.width < -threshold || velocity < -180) && player.nextTrack != nil {
+                    isChangingTrack = true
+                    player.playNext()
+                } else if (value.translation.width > threshold || velocity > 180) && player.previousTrack != nil {
+                    isChangingTrack = true
+                    player.playPrevious()
+                }
+                // Если не сменили трек — карусель вернётся сама через GestureState
+            }
     }
 
     private func coverCard(track: Track, size: CGFloat, slotX: CGFloat, stepWidth: CGFloat) -> some View {
-        let totalOffset = slotX + carouselOffsetX
-        let normalizedDist = min(max(totalOffset / stepWidth, -1.0), 1.0)
+        let dragOffset = carouselDragX
+        let totalOffset = slotX + dragOffset
+        let normalizedDist = (totalOffset / stepWidth).clamped(to: -1.5...1.5)
         let absNorm = abs(normalizedDist)
 
         let isCenter = (slotX == 0)
-        let scale: CGFloat = isCenter ? (1.0 - absNorm * 0.12) : (0.88 + (1.0 - absNorm) * 0.12)
-        let alpha: Double = isCenter ? (1.0 - Double(absNorm) * 0.50) : (0.45 + (1.0 - Double(absNorm)) * 0.55)
+        let scale: CGFloat = isCenter
+            ? (1.0 - absNorm * 0.10).clamped(to: 0.88...1.0)
+            : (0.86 + (1.0 - absNorm.clamped(to: 0...1)) * 0.14)
+        let alpha: Double = isCenter
+            ? (1.0 - Double(absNorm) * 0.55).clamped(to: 0.3...1.0)
+            : (0.38 + (1.0 - Double(absNorm.clamped(to: 0...1))) * 0.62)
 
         let alb = appVm.albumForTrack(track)
         let coverStr = track.coverUrl ?? alb?.coverUrl
@@ -250,62 +288,68 @@ public struct FullPlayerView: View {
             }
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .shadow(color: isCenter ? player.playerGlowColor.opacity(0.35) : .black.opacity(0.3), radius: isCenter ? 24 : 10, x: 0, y: isCenter ? 12 : 5)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(
+            color: isCenter ? player.playerGlowColor.opacity(0.32) : .black.opacity(0.28),
+            radius: isCenter ? 22 : 8,
+            x: 0,
+            y: isCenter ? 10 : 4
+        )
         .scaleEffect(scale)
         .opacity(alpha)
         .offset(x: totalOffset)
+        .animation(.interactiveSpring(response: 0.28, dampingFraction: 0.78, blendDuration: 0.1), value: dragOffset)
     }
 
-    // MARK: - Track Info & Three-Dots Menu Row
-    private func trackInfoAndMenuRow(track: Track) -> some View {
-        HStack(alignment: .center, spacing: 14) {
+    // MARK: - Track Info & Three-Dots Menu
+
+    private func trackInfoAndMenuRow(track: Track, geo: GeometryProxy) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            // Название трека + артист
             VStack(alignment: .leading, spacing: 4) {
                 Text(track.title)
-                    .font(.system(size: 22, weight: .black))
+                    .font(.system(size: 20, weight: .black))
                     .foregroundColor(.white)
                     .lineLimit(1)
+                    .truncationMode(.tail)
 
                 Text(track.displayArtist)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.white.opacity(0.55))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white.opacity(0.52))
                     .lineLimit(1)
+                    .truncationMode(.tail)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer(minLength: 16)
-
-            HStack(spacing: 8) {
-                // Lyrics toggle
+            // Кнопки: лайк, текст, ещё
+            HStack(spacing: 6) {
+                // Тексты
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.25)) {
+                    withAnimation(.easeInOut(duration: 0.22)) {
                         showLyrics.toggle()
                     }
                 }) {
                     Image(systemName: showLyrics ? "quote.bubble.fill" : "quote.bubble")
-                        .font(.system(size: 19, weight: .semibold))
-                        .foregroundColor(showLyrics ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.65))
-                        .frame(width: 40, height: 40)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(showLyrics ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.6))
+                        .frame(width: 38, height: 38)
                         .background(showLyrics ? Color.white.opacity(0.12) : Color.white.opacity(0.05))
                         .clipShape(Circle())
                 }
 
-                // Like button
-                Button(action: {
-                    appVm.toggleLike(trackId: track.id)
-                }) {
+                // Лайк
+                Button(action: { appVm.toggleLike(trackId: track.id) }) {
                     Image(systemName: appVm.isLiked(track.id) ? "heart.fill" : "heart")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(appVm.isLiked(track.id) ? Color(red: 1.0, green: 0.42, blue: 0.54) : .white.opacity(0.65))
-                        .frame(width: 40, height: 40)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(appVm.isLiked(track.id) ? Color(red: 1.0, green: 0.42, blue: 0.54) : .white.opacity(0.6))
+                        .frame(width: 38, height: 38)
                         .background(Color.white.opacity(0.05))
                         .clipShape(Circle())
                 }
 
-                // "Три точки" (More Menu)
+                // Три точки — меню
                 Menu {
-                    Button(action: {
-                        appVm.openPlaylistPicker(for: track)
-                    }) {
+                    Button(action: { appVm.openPlaylistPicker(for: track) }) {
                         Label("Добавить в плейлист...", systemImage: "text.badge.plus")
                     }
 
@@ -325,7 +369,7 @@ public struct FullPlayerView: View {
 
                     if let album = appVm.albumForTrack(track) {
                         Button(action: {
-                            dismiss()
+                            withAnimation { appVm.showFullPlayer = false }
                             appVm.currentScreen = .library
                             appVm.selectedAlbum = album
                         }) {
@@ -340,19 +384,21 @@ public struct FullPlayerView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white.opacity(0.75))
-                        .frame(width: 40, height: 40)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.white.opacity(0.7))
+                        .frame(width: 38, height: 38)
                         .background(Color.white.opacity(0.05))
                         .clipShape(Circle())
                 }
             }
+            .fixedSize()
         }
-        .padding(.horizontal, 28) // Generous margins from screen edges
+        .padding(.horizontal, 22)
     }
 
-    // MARK: - Scrubber Slider Area
-    private var scrubberSliderArea: some View {
+    // MARK: - Scrubber Slider
+
+    private func scrubberSliderArea(geo: GeometryProxy) -> some View {
         VStack(spacing: 6) {
             let duration = max(Double(player.durationMs), 1.0)
             let current = isDraggingSlider ? dragSliderValue : Double(player.currentTimeMs)
@@ -377,80 +423,86 @@ public struct FullPlayerView: View {
 
             HStack {
                 Text(formatTime(current))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.40))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.38))
 
                 Spacer()
 
                 Text(formatTime(duration))
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.40))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.38))
             }
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 22)
     }
 
     // MARK: - Playback Controls Row
-    private var playbackControlsRow: some View {
-        HStack(spacing: 24) {
+
+    private func playbackControlsRow(geo: GeometryProxy) -> some View {
+        HStack(spacing: 0) {
             // Shuffle
             Button(action: { player.toggleShuffle() }) {
                 Image(systemName: "shuffle")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(player.isShuffled ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.4))
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundColor(player.isShuffled ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.38))
                     .frame(width: 44, height: 44)
             }
 
             Spacer()
 
-            // Previous
+            // Назад
             Button(action: { player.playPrevious() }) {
                 Image(systemName: "backward.fill")
-                    .font(.system(size: 26))
+                    .font(.system(size: 24))
                     .foregroundColor(.white)
                     .frame(width: 44, height: 44)
             }
 
-            // Play / Pause (Large)
+            Spacer(minLength: 12)
+
+            // Пауза / Воспроизведение
             Button(action: { player.togglePlayPause() }) {
                 Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 28))
+                    .font(.system(size: 26))
                     .foregroundColor(.black)
-                    .frame(width: 68, height: 68)
+                    .frame(width: 64, height: 64)
                     .background(Color.white)
                     .clipShape(Circle())
-                    .shadow(color: .white.opacity(0.2), radius: 10, x: 0, y: 5)
+                    .shadow(color: .white.opacity(0.18), radius: 10, x: 0, y: 4)
             }
 
-            // Next
+            Spacer(minLength: 12)
+
+            // Вперёд
             Button(action: { player.playNext() }) {
                 Image(systemName: "forward.fill")
-                    .font(.system(size: 26))
+                    .font(.system(size: 24))
                     .foregroundColor(.white)
                     .frame(width: 44, height: 44)
             }
 
             Spacer()
 
-            // Repeat
+            // Повтор
             Button(action: { player.toggleRepeat() }) {
                 Image(systemName: "repeat")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(player.isRepeating ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.4))
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundColor(player.isRepeating ? Color(red: 0.91, green: 0.835, blue: 1.0) : .white.opacity(0.38))
                     .frame(width: 44, height: 44)
             }
         }
-        .padding(.horizontal, 32)
-        .padding(.bottom, 36)
+        .padding(.horizontal, 22)
     }
+
+    // MARK: - Helpers
 
     private var coverPlaceholder: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.08))
+            .fill(Color.white.opacity(0.07))
             .overlay(
                 Image(systemName: "music.note")
-                    .font(.system(size: 48))
-                    .foregroundColor(.white.opacity(0.2))
+                    .font(.system(size: 44))
+                    .foregroundColor(.white.opacity(0.18))
             )
     }
 
