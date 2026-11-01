@@ -273,9 +273,9 @@ public final class AudioPlayerService: ObservableObject {
         }
     }
 
-    public func playPrevious() {
-        // If track played for > 3 seconds, restart current track
-        if currentTimeMs > 3000 {
+    public func playPrevious(force: Bool = false) {
+        // If track played for > 3 seconds, restart current track (unless forced by swipe)
+        if !force && currentTimeMs > 3000 {
             seek(to: 0)
             return
         }
