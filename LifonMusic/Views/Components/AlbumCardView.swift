@@ -2,64 +2,73 @@ import SwiftUI
 
 public struct AlbumCardView: View {
     public let album: Album
-    public let onSelect: () -> Void
+    public var onSelect: (() -> Void)? = nil
 
-    public init(album: Album, onSelect: @escaping () -> Void) {
+    public init(album: Album, onSelect: (() -> Void)? = nil) {
         self.album = album
         self.onSelect = onSelect
     }
 
     public var body: some View {
-        Button(action: onSelect) {
-            VStack(alignment: .leading, spacing: 8) {
-                // Cover Art
-                ZStack(alignment: .bottomTrailing) {
-                    if let urlStr = album.coverUrl, let url = URL(string: urlStr) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(1, contentMode: .fill)
-                            default:
-                                albumPlaceholder
-                            }
+        if let onSelect = onSelect {
+            Button(action: onSelect) {
+                cardBody
+            }
+            .buttonStyle(.plain)
+        } else {
+            cardBody
+        }
+    }
+
+    private var cardBody: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Cover Art
+            ZStack(alignment: .bottomTrailing) {
+                if let urlStr = album.coverUrl, let url = URL(string: urlStr) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(1, contentMode: .fill)
+                        default:
+                            albumPlaceholder
                         }
-                    } else {
-                        albumPlaceholder
                     }
-
-                    // Year Badge
-                    Text(album.year)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .background(Color.black.opacity(0.65))
-                        .clipShape(Capsule())
-                        .padding(8)
+                } else {
+                    albumPlaceholder
                 }
-                .aspectRatio(1, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(glowBorderColor, lineWidth: 1)
-                )
 
-                // Title and Track Count
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(album.title)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
+                // Year Badge
+                Text(album.year)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.65))
+                    .clipShape(Capsule())
+                    .padding(8)
+            }
+            .aspectRatio(1, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(glowBorderColor, lineWidth: 1)
+            )
 
-                    Text("\(album.tracks.count) \(pluralTracks(album.tracks.count))")
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundColor(.white.opacity(0.45))
-                }
+            // Title and Track Count
+            VStack(alignment: .leading, spacing: 2) {
+                Text(album.title)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+
+                Text("\(album.tracks.count) \(pluralTracks(album.tracks.count))")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(.white.opacity(0.45))
             }
         }
-        .buttonStyle(.plain)
+        .contentShape(Rectangle())
     }
 
     private var glowBorderColor: Color {

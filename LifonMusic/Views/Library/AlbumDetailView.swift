@@ -124,7 +124,20 @@ public struct AlbumDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                        Text("Назад")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    .foregroundColor(Color(red: 0.91, green: 0.835, blue: 1.0))
+                }
+            }
+
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     appVm.showEqualizer = true

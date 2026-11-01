@@ -31,6 +31,26 @@ public final class AudioPlayerService: ObservableObject {
     public var playContext: PlayContext = .album
     public var currentPlaylist: [Track] = []
 
+    public var previousTrack: Track? {
+        guard !activeQueue.isEmpty else { return nil }
+        if currentQueueIndex > 0 {
+            return activeQueue[currentQueueIndex - 1]
+        } else if let last = activeQueue.indices.last, last > 0 {
+            return activeQueue[last]
+        }
+        return nil
+    }
+
+    public var nextTrack: Track? {
+        guard !activeQueue.isEmpty else { return nil }
+        if currentQueueIndex + 1 < activeQueue.count {
+            return activeQueue[currentQueueIndex + 1]
+        } else if !activeQueue.isEmpty {
+            return activeQueue[0]
+        }
+        return nil
+    }
+
     private var player: AVPlayer?
     private var timeObserverToken: Any?
     private var itemEndObserver: Any?

@@ -156,9 +156,10 @@ public struct LibraryView: View {
 
                                     LazyVGrid(columns: gridColumns, spacing: 16) {
                                         ForEach(matchedAlbums) { album in
-                                            NavigationLink(destination: AlbumDetailView(album: album)) {
-                                                AlbumCardView(album: album) {}
+                                            NavigationLink(value: album) {
+                                                AlbumCardView(album: album)
                                             }
+                                            .buttonStyle(.plain)
                                         }
                                     }
                                     .padding(.horizontal, 16)
@@ -177,9 +178,10 @@ public struct LibraryView: View {
 
                             LazyVGrid(columns: gridColumns, spacing: 16) {
                                 ForEach(appVm.albums) { album in
-                                    NavigationLink(destination: AlbumDetailView(album: album)) {
-                                        AlbumCardView(album: album) {}
+                                    NavigationLink(value: album) {
+                                        AlbumCardView(album: album)
                                     }
+                                    .buttonStyle(.plain)
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -192,6 +194,9 @@ public struct LibraryView: View {
                 }
             }
             .navigationBarHidden(true)
+            .navigationDestination(for: Album.self) { album in
+                AlbumDetailView(album: album)
+            }
         }
     }
 }
